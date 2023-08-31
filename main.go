@@ -1,12 +1,12 @@
 package main
 
 import (
+	tool "GT/Tool"
 	"fmt"
+	"github.com/urfave/cli/v2"
 	"io/ioutil"
 	"os"
 	"strings"
-
-	"github.com/urfave/cli/v2"
 )
 
 func readFile(filePath string) (string, error) {
@@ -99,4 +99,5 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
+	tool.Test()
 }

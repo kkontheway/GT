@@ -1,6 +1,6 @@
 module GT
 
-go 1.17
+go 1.20
 
 require github.com/urfave/cli/v2 v2.25.7
 

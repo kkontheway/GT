@@ -2,46 +2,16 @@ package main
 
 import (
 	tool "GT/Tool"
+	"GT/config"
 	"fmt"
-	"github.com/urfave/cli/v2"
-	"io/ioutil"
 	"os"
 	"strings"
+
+	"github.com/urfave/cli/v2"
 )
 
-func readFile(filePath string) (string, error) {
-	content, err := ioutil.ReadFile(filePath)
-	if err != nil {
-		return "", err
-	}
-	return string(content), nil
-}
-func removeDuplicates(lines []string) []string {
-	seen := make(map[string]bool)
-	uniqueLines := []string{}
-
-	for _, line := range lines {
-		line = strings.TrimSpace(line)
-		if line != "" && !seen[line] {
-			seen[line] = true
-			uniqueLines = append(uniqueLines, line)
-		}
-	}
-	return uniqueLines
-}
-func saveToFile(filePath string, content string) error {
-	//content := strings.Join(lines, "\n")
-	return os.WriteFile(filePath, []byte(content), 0644)
-}
-func countLines(filepath string) (int, error) {
-	content, err := os.ReadFile(filepath)
-	if err != nil {
-		return 0, err
-	}
-	lines := strings.Split(string(content), "\n")
-	return len(lines), nil
-}
 func main() {
+	config.ShowBanner()
 	app := &cli.App{
 		Name:    "GTool",
 		Usage:   "Idong",
@@ -51,14 +21,9 @@ func main() {
 				Name:     "file",
 				Aliases:  []string{"f"},
 				Usage:    "去重",
-				Value:    "文件地址",
+				Value:    "",
 				Category: "文件操作：",
 			},
-			// &cli.StringFlag{
-			// 	Name:    "OutPut",
-			// 	Aliases: []string{"o"},
-			// 	Usage:   "Save file",
-			// },
 		},
 		Action: func(c *cli.Context) error {
 			filePath := c.String("file")
@@ -67,22 +32,22 @@ func main() {
 				return fmt.Errorf("Please provide a valid file path using --file flag")
 			}
 			//统计原始行数
-			originalLineCount, err := countLines(filePath)
+			originalLineCount, err := tool.CountLines(filePath)
 			if err != nil {
 				return fmt.Errorf("无法统计行数：%s", err)
 			}
 			//读取文件
-			content, err := readFile(filePath)
+			content, err := tool.ReadFile(filePath)
 			if err != nil {
 				return fmt.Errorf("Error reading file: %s", err)
 			}
 			//去重复
-			uniqueLines := removeDuplicates(strings.Split(content, "\n"))
+			uniqueLines := tool.RemoveDuplicates(strings.Split(content, "\n"))
 			//统计去重后的行数
 			uniqueLineCount := len(uniqueLines)
 			//outputPath := c.String("OutPut")
 			processedContent := strings.Join(uniqueLines, "\n")
-			err = saveToFile(filePath, processedContent)
+			err = tool.SaveToFile(filePath, processedContent)
 			if err != nil {
 				return fmt.Errorf("Error saving processed content to file: %s", err)
 			}
@@ -99,5 +64,4 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	tool.Test()
 }
